@@ -51,3 +51,70 @@ def init_db(app):
                             db.execute('INSERT INTO profesionales(nombre,especialidad,cargo) VALUES(?,?,?)', (nombre,especialidad,cargo))
                     db.execute("INSERT INTO configuracion(clave,valor) VALUES('profesionales_demo_v1','1')")
         db.commit()
+
+        if 'activo' not in {r['name'] for r in db.execute('PRAGMA table_info(pacientes)')}:
+            db.execute('ALTER TABLE pacientes ADD COLUMN activo INTEGER NOT NULL DEFAULT 1')
+        db.executescript("""
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY, username TEXT NOT NULL UNIQUE,
+            nombre TEXT NOT NULL, password_hash TEXT NOT NULL,
+            rol TEXT NOT NULL CHECK(rol IN ('admin','recepcion','profesional','auditor')),
+            profesional_id INTEGER REFERENCES profesionales(id),
+            activo INTEGER NOT NULL DEFAULT 1,
+            CHECK(rol != 'profesional' OR profesional_id IS NOT NULL));
+        CREATE UNIQUE INDEX IF NOT EXISTS usuario_profesional_unico ON usuarios(profesional_id) WHERE profesional_id IS NOT NULL;
+        CREATE TABLE IF NOT EXISTS sesiones (
+            token_hash TEXT PRIMARY KEY,usuario_id INTEGER NOT NULL REFERENCES usuarios(id),
+            creada INTEGER NOT NULL,ultima INTEGER NOT NULL);
+        CREATE TABLE IF NOT EXISTS intentos (
+            clave TEXT PRIMARY KEY, fallos INTEGER NOT NULL, desde INTEGER NOT NULL);
+        CREATE TABLE IF NOT EXISTS auditoria (
+            id INTEGER PRIMARY KEY,usuario_id INTEGER REFERENCES usuarios(id),
+            accion TEXT NOT NULL,entidad TEXT NOT NULL,referencia INTEGER,fecha INTEGER NOT NULL);
+        CREATE TRIGGER IF NOT EXISTS auditoria_no_update BEFORE UPDATE ON auditoria
+            BEGIN SELECT RAISE(ABORT,'Auditoría inmutable'); END;
+        CREATE TRIGGER IF NOT EXISTS auditoria_no_delete BEFORE DELETE ON auditoria
+            BEGIN SELECT RAISE(ABORT,'Auditoría inmutable'); END;
+        """)
+        db.commit()
+
+        if 'activo' not in {r['name'] for r in db.execute('PRAGMA table_info(profesionales)')}:
+            db.execute('ALTER TABLE profesionales ADD COLUMN activo INTEGER NOT NULL DEFAULT 1')
+        db.commit()
+        if 'paciente_id' not in {r['name'] for r in db.execute('PRAGMA table_info(usuarios)')}:
+            db.execute('PRAGMA foreign_keys=OFF')
+            try:
+                with db:
+                    db.execute("""CREATE TABLE usuarios_nuevos (
+                        id INTEGER PRIMARY KEY,username TEXT NOT NULL UNIQUE,nombre TEXT NOT NULL,password_hash TEXT NOT NULL,
+                        rol TEXT NOT NULL CHECK(rol IN ('admin','recepcion','profesional','auditor','paciente')),
+                        profesional_id INTEGER REFERENCES profesionales(id),paciente_id INTEGER REFERENCES pacientes(id),
+                        activo INTEGER NOT NULL DEFAULT 1,
+                        CHECK((rol='profesional' AND profesional_id IS NOT NULL AND paciente_id IS NULL)
+                           OR (rol='paciente' AND paciente_id IS NOT NULL AND profesional_id IS NULL)
+                           OR (rol IN ('admin','recepcion','auditor') AND profesional_id IS NULL AND paciente_id IS NULL)))""")
+                    db.execute("""INSERT INTO usuarios_nuevos(id,username,nombre,password_hash,rol,profesional_id,activo)
+                        SELECT id,username,nombre,password_hash,rol,CASE WHEN rol='profesional' THEN profesional_id ELSE NULL END,activo FROM usuarios""")
+                    db.execute('DROP TABLE usuarios')
+                    db.execute('ALTER TABLE usuarios_nuevos RENAME TO usuarios')
+                    db.execute('CREATE UNIQUE INDEX usuario_profesional_unico ON usuarios(profesional_id) WHERE profesional_id IS NOT NULL')
+            finally:
+                db.execute('PRAGMA foreign_keys=ON')
+        db.executescript("""
+        CREATE UNIQUE INDEX IF NOT EXISTS usuario_paciente_unico ON usuarios(paciente_id) WHERE paciente_id IS NOT NULL;
+        CREATE TABLE IF NOT EXISTS admisiones (
+            id INTEGER PRIMARY KEY,paciente_id INTEGER NOT NULL REFERENCES pacientes(id),
+            profesional_id INTEGER REFERENCES profesionales(id),fecha TEXT NOT NULL,
+            especialidad TEXT NOT NULL,motivo TEXT NOT NULL,
+            estado TEXT NOT NULL DEFAULT 'pendiente' CHECK(estado IN ('pendiente','en_atencion','atendido','cancelado')),
+            activo INTEGER NOT NULL DEFAULT 1,creado_por INTEGER NOT NULL REFERENCES usuarios(id),
+            creada INTEGER NOT NULL,version INTEGER NOT NULL DEFAULT 1);
+        CREATE UNIQUE INDEX IF NOT EXISTS admision_abierta_unica ON admisiones(paciente_id)
+            WHERE activo=1 AND estado IN ('pendiente','en_atencion');
+        """)
+        if 'admision_id' not in {r['name'] for r in db.execute('PRAGMA table_info(atenciones)')}:
+            db.execute('ALTER TABLE atenciones ADD COLUMN admision_id INTEGER REFERENCES admisiones(id)')
+        db.execute('CREATE UNIQUE INDEX IF NOT EXISTS atencion_admision_unica ON atenciones(admision_id) WHERE admision_id IS NOT NULL')
+        db.commit()
+        if db.execute('PRAGMA foreign_key_check').fetchone():
+            raise RuntimeError('La migración detectó una referencia inválida. Conserva el respaldo y revisa la base.')

@@ -1,0 +1,93 @@
+depth=0 CN = localhost
+verify return:1
+CONNECTED(00000003)
+---
+Certificate chain
+ 0 s:CN = localhost
+   i:CN = localhost
+   a:PKEY: rsaEncryption, 3072 (bit); sigalg: RSA-SHA256
+   v:NotBefore: Oct 13 14:19:51 2026 GMT; NotAfter: Jan 11 14:19:51 2027 GMT
+---
+Server certificate
+-----BEGIN CERTIFICATE-----
+MIIEXjCCAsagAwIBAgIUEopgdkVDxRLlguIveKnoGaqcda8wDQYJKoZIhvcNAQEL
+BQAwFDESMBAGA1UEAwwJbG9jYWxob3N0MB4XDTI2MTAxMzE0MTk1MVoXDTI3MDEx
+MTE0MTk1MVowFDESMBAGA1UEAwwJbG9jYWxob3N0MIIBojANBgkqhkiG9w0BAQEF
+AAOCAY8AMIIBigKCAYEA5jv19EpfPRnAxPT4dzykqUtJSQEV++VuXLGoObcpKEgs
+xy1WbjZWOXmaqW4nbgs/RFU4QQizem0FbTSkA1xpeCifO3B1PfG1vfSghi8d7yQp
+2UKPSySZheOHcyVGBDe0zDJgDoZt4Gyrd9RJOOwTHf2VS8up68DcFR0yGL4IIftQ
+0z8gcxZSIyi/22qeNWS+5MKQ9g0D3TBZr9+ADNDO0sSjFCVRVi7/pZjJp4DIJOKO
+5Jmool4wnhI/S7NhCtIP47WjT1QzzYBD6PprS64BPMiClQ+i8bMqZztXUYwsT72q
+PSKNEtraQDrDls0i+cpPMKU/CvmoRoMJ5rCUZz/7EO82iXdERyoBXNWtRXfjT1Ab
+1jHTObLBndz3uuS9VQoTjot1BMY4Mrlq+z8zyTXGDjIJexBUzzfQ35nxvepjM0/F
+MPeMWM0IRwuMDNZZ2wkTLRPHqadsTZBC0bQUmnk136RIzihYf+Bqg7wz5fQ0NV63
+4zg0ugHSyw2IhljxqPONAgMBAAGjgacwgaQwHQYDVR0OBBYEFIrIdD01SPkC4e+n
+LG0YIXRIIJyfMB8GA1UdIwQYMBaAFIrIdD01SPkC4e+nLG0YIXRIIJyfMCwGA1Ud
+EQQlMCOCCWxvY2FsaG9zdIcEfwAAAYcQAAAAAAAAAAAAAAAAAAAAATAPBgNVHRMB
+Af8EBTADAQH/MA4GA1UdDwEB/wQEAwICpDATBgNVHSUEDDAKBggrBgEFBQcDATAN
+BgkqhkiG9w0BAQsFAAOCAYEAz5ba5BCAD12iy8/qSYUavKhLJBC3KyqbJ+Fk8+kb
+mCa8n5AuxPgGhCfksjq28Hj/cZ2cr4OZBN25URqGEmu7aQb6p636PG229Fj4zbbQ
+2OqEbv031u4gdAS+WfYoiJlNtQKsM94DvO3UYkGrHwfCanWCJg0RhNHCs3bA//sf
+nSXXxyMJm6XA/iDuIBuU3Z9O8Dp4afyuJtqE/0dX1pf6SiLs5o40fkWRmvUtMr/3
+L7nkXtnGHk81IuGPZ3/5eS584DWQRbqOfc3EG7fkPG5aktKq4C1Z7DNDsxPh2TRo
+Mn2qdrHw4nRq2IBC8cMbKixBpYuvAqlGZrMde2kafmJxYFAguuUZMAFVQ6lCdPJf
+QJ3gdFR80BAFMJhVWrDBslfwvkqXcFFLHCB+M/PeGLa9oijPeWuMTEEhCqel7T9J
+CWC0F4q9IFafTr67KnGNdyBvgsWpfteAq/+QWPHHkIh6rVANnhbaPy2y/HQ2x3nu
+i/QTobtiCSB3wo2ACQiuq6D+
+-----END CERTIFICATE-----
+subject=CN = localhost
+issuer=CN = localhost
+---
+No client certificate CA names sent
+Peer signing digest: SHA256
+Peer signature type: RSA-PSS
+Server Temp Key: X25519, 253 bits
+---
+SSL handshake has read 1828 bytes and written 391 bytes
+Verification: OK
+Verified peername: localhost
+---
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Server public key is 3072 bit
+Secure Renegotiation IS NOT supported
+Compression: NONE
+Expansion: NONE
+No ALPN negotiated
+Early data was not sent
+Verify return code: 0 (ok)
+---
+DONE
+---
+Post-Handshake New Session Ticket arrived:
+SSL-Session:
+    Protocol  : TLSv1.3
+    Cipher    : TLS_AES_256_GCM_SHA384
+    Session-ID: A48CD5B0C491C3023823CF33AB6F7798EC12D9CF2824C9A7BBF3436212ADC4FD
+    Session-ID-ctx: 
+    Resumption PSK: 6784EB73AD9205680BD729B1C4BC964E55480972E078D7067E86DE2B66855867D1A9D9A33191C2235848C866C4698D10
+    PSK identity: None
+    PSK identity hint: None
+    SRP username: None
+    TLS session ticket lifetime hint: 7200 (seconds)
+    TLS session ticket:
+    0000 - e7 75 a8 1e 8a 64 36 8a-97 3d 9c f9 fe 68 25 01   .u...d6..=...h%.
+    0010 - 9a cb 11 82 8a 99 d8 a2-f8 b0 49 bc f8 ef e8 ba   ..........I.....
+    0020 - 8c 32 28 1c b9 58 32 c8-e2 a7 99 2e 6d 7b 86 ee   .2(..X2.....m{..
+    0030 - 93 41 b3 56 c3 9a fb eb-f2 4c a2 80 8b 2a cb a7   .A.V.....L...*..
+    0040 - c5 a5 15 a8 18 6d dc 57-20 c6 aa ad 9f bc 5b 46   .....m.W .....[F
+    0050 - dd dc 4a eb 59 f2 c8 fa-31 c8 ad 9f c0 5d e0 b8   ..J.Y...1....]..
+    0060 - 3c 73 79 36 df 15 d1 d1-e7 17 8f df dd 98 c7 8f   <sy6............
+    0070 - 18 27 a8 8e 1c c7 08 a1-bd b7 80 8e a1 f5 bd f0   .'..............
+    0080 - 37 ec 3f 62 9f 5e 04 6b-47 76 ea f5 99 8a b5 bf   7.?b.^.kGv......
+    0090 - 7f 68 f7 01 ff ca 85 46-1e 46 b9 e1 72 a1 6b 81   .h.....F.F..r.k.
+    00a0 - 7f dd 40 91 7d 5d 7b 9e-08 6e ed 88 f7 b9 4c a2   ..@.}]{..n....L.
+    00b0 - 08 e0 29 ff 8b 83 ec b0-fe 25 34 08 dd 90 38 03   ..)......%4...8.
+    00c0 - fe 26 27 bf c1 ac 3e 5e-aa ff 48 af aa 31 0c ab   .&'...>^..H..1..
+
+    Start Time: 1791901255
+    Timeout   : 7200 (sec)
+    Verify return code: 0 (ok)
+    Extended master secret: no
+    Max Early Data: 0
+---
+read R BLOCK

@@ -20,15 +20,23 @@ class ActualizacionTest(unittest.TestCase):
             """)
             db.commit(); db.close()
             for _ in range(2):
-                app = create_app({'TESTING':True,'DATABASE':dbpath,'SECRET_KEY':'test'})
+                app = create_app({'TESTING':True,'DATABASE':dbpath,'SECRET_KEY':'a'*64})
+                from app.models.usuario_model import crear_usuario
+                with app.app_context():
+                    if not get_db().execute('SELECT 1 FROM usuarios').fetchone():
+                        crear_usuario('admin','Admin','Frase de prueba larga','admin')
                 client=app.test_client()
-                self.assertEqual(client.get('/').status_code,200)
-                r=client.get('/pacientes/1')
+                client.get('/login',base_url='https://localhost')
+                with client.session_transaction() as ses:
+                    csrf=ses['csrf']
+                client.post('/login',base_url='https://localhost',data={'csrf':csrf,'username':'admin','password':'Frase de prueba larga'})
+                self.assertEqual(client.get('/',base_url='https://localhost').status_code,200)
+                r=client.get('/pacientes/1',base_url='https://localhost')
                 self.assertEqual(r.status_code,200)
                 self.assertIn(b'Paciente anterior',r.data)
                 self.assertIn(b'Profesional anterior',r.data)
-                self.assertIn(b'Registrar atenci',r.data)
-                self.assertEqual(client.get('/profesionales').status_code,200)
+                self.assertIn(b'Historial cl',r.data)
+                self.assertEqual(client.get('/profesionales',base_url='https://localhost').status_code,200)
                 with app.app_context():
                     self.assertEqual(get_db().execute('SELECT COUNT(*) FROM profesionales').fetchone()[0],7)
                     self.assertEqual(get_db().execute('SELECT COUNT(*) FROM atenciones').fetchone()[0],1)
