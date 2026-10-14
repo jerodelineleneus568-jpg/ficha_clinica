@@ -1,13 +1,15 @@
-# Validación de la versión de admisión
+# Validación de agenda, citas y documentos
 
-13 de octubre de 2026, entorno local de construcción, datos ficticios. No es la validación del servidor de la usuaria.
+14 de octubre de 2026, entorno de construcción con datos ficticios. No corresponde al servidor de la usuaria.
 
-- 14 pruebas aprobadas: seguridad previa, migración de cuentas existentes, CRUD, versiones obsoletas, Excel válido, lote inválido sin importación parcial, fórmulas, aislamiento del portal de pacientes, dos funcionarios para un paciente y guardado único del historial.
-- pip-audit 2.10.1: 10 dependencias runtime; 0 vulnerabilidades conocidas reportadas.
-- Bandit 1.9.4: app y run.py, 0 hallazgos, 0 errores.
-- Semgrep CE 1.177.0: p/python y p/owasp-top-ten, 156 reglas, 16 archivos Python, 0 hallazgos, 0 errores. Las plantillas no forman parte del SAST Python; se renderizaron en los tests.
-- Revisión Git del árbol distribuido ensayada en una copia temporal, 0 señales. El historial y el repositorio de la usuaria quedan pendientes.
-- ZAP pasivo y activo limitado: pendiente en el entorno de la usuaria. Las rutas nuevas amplían la superficie y necesitan nuevo DAST.
-- TLS: los resultados anteriores se conservan en historico_seguridad y no validan el certificado, IP o servidor actual. Ejecuta scripts/pruebas_https.sh en tu Ubuntu tras iniciar la aplicación.
+- 22 pruebas aprobadas. Incluyen generación por intervalos, pausas, rechazo de cruces, capacidad grupal, reserva concurrente sin sobreventa, reprogramación, cancelación que libera cupo, CRUD, tipos, vinculación con admisión, atención e historial y permisos de adjuntos.
+- pip-audit 2.10.1: 10 dependencias runtime, 0 vulnerabilidades conocidas reportadas.
+- Bandit 1.9.4: código Python app y run.py, 0 hallazgos, 0 errores.
+- Semgrep CE 1.177.0: p/python y p/owasp-top-ten, 156 reglas, 21 archivos Python, 0 hallazgos, 0 errores. No cubre las plantillas HTML; sus páginas principales se renderizaron en los tests.
+- El actualizador se verifica adicionalmente en una copia con IP distinta, base existente y certificados para comprobar preservación. No cambia automáticamente el SAN del certificado.
+- Los resultados de versiones anteriores están en historico_seguridad e historico_admision. No sustituyen el DAST ni la revisión del repositorio actual.
+- ZAP pasivo/activo, manual TLS y Git del servidor de la usuaria: pendientes de repetir con las rutas nuevas.
 
-No equivale a cumplimiento completo OWASP ni a certificación clínica. Repite las herramientas para el despliegue real y documenta fecha, versiones, alcance y hallazgos. No se distribuyen certificados privados, SQLite ni secretos de usuarios.
+La comprobación de firma y tamaño de adjuntos no es un análisis antivirus ni validación estructural completa. Se descargan como archivos adjuntos autenticados, sin ejecutarse ni mostrarse embebidos en el servidor. Sigue pendiente el análisis antimalware y el diseño institucional de retención/cifrado de disco.
+
+No equivale a una certificación OWASP o clínica. Repite las revisiones en el despliegue real y documenta versión, fecha y alcance.

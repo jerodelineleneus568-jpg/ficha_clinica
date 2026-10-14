@@ -1,3 +1,7 @@
+# Agenda y documentos externos
+
+Consulta **AGENDA.md** para actualizar y crear agendas, reservar citas, parametrizar rendimiento y adjuntar documentos.
+
 # Ficha clínica · Funcionarios, pacientes, roles y admisión
 
 Consulta primero **ADMISION.md** para actualizar y usar el CRUD, la lista de espera y Excel.

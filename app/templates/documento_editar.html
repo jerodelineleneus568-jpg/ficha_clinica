@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<h1>Editar descripción</h1><p>{{ documento.nombre }}</p><form method="post"><input type="hidden" name="csrf" value="{{ session.csrf }}"><label>Descripción<input name="descripcion" maxlength="300" value="{{ request.form.get('descripcion',documento.descripcion) }}" required></label><button>Guardar</button></form>{% endblock %}

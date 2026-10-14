@@ -118,3 +118,34 @@ def init_db(app):
         db.commit()
         if db.execute('PRAGMA foreign_key_check').fetchone():
             raise RuntimeError('La migración detectó una referencia inválida. Conserva el respaldo y revisa la base.')
+
+        db.executescript("""
+        CREATE TABLE IF NOT EXISTS tipos_atencion (
+            id INTEGER PRIMARY KEY,nombre TEXT NOT NULL UNIQUE,minutos INTEGER NOT NULL CHECK(minutos BETWEEN 5 AND 240),
+            cupos INTEGER NOT NULL DEFAULT 1 CHECK(cupos BETWEEN 1 AND 20),activo INTEGER NOT NULL DEFAULT 1);
+        CREATE TABLE IF NOT EXISTS agenda_bloques (
+            id INTEGER PRIMARY KEY,profesional_id INTEGER NOT NULL REFERENCES profesionales(id),
+            tipo_id INTEGER NOT NULL REFERENCES tipos_atencion(id),fecha TEXT NOT NULL,inicio TEXT NOT NULL,fin TEXT NOT NULL,
+            cupos INTEGER NOT NULL CHECK(cupos BETWEEN 1 AND 20),activo INTEGER NOT NULL DEFAULT 1,
+            creado_por INTEGER NOT NULL REFERENCES usuarios(id),version INTEGER NOT NULL DEFAULT 1);
+        CREATE INDEX IF NOT EXISTS agenda_busqueda ON agenda_bloques(profesional_id,fecha,activo);
+        CREATE TABLE IF NOT EXISTS documentos (
+            id INTEGER PRIMARY KEY,paciente_id INTEGER NOT NULL REFERENCES pacientes(id),nombre TEXT NOT NULL,
+            descripcion TEXT NOT NULL,mime TEXT NOT NULL,tamano INTEGER NOT NULL,sha256 TEXT NOT NULL,
+            contenido BLOB NOT NULL,creado_por INTEGER NOT NULL REFERENCES usuarios(id),creada INTEGER NOT NULL,
+            activo INTEGER NOT NULL DEFAULT 1);
+        """)
+        if 'slot_id' not in {r['name'] for r in db.execute('PRAGMA table_info(admisiones)')}:
+            with db:
+                db.execute('ALTER TABLE admisiones ADD COLUMN slot_id INTEGER REFERENCES agenda_bloques(id)')
+                db.execute('DROP INDEX IF EXISTS admision_abierta_unica')
+                db.execute("""CREATE UNIQUE INDEX admision_abierta_unica ON admisiones(paciente_id)
+                    WHERE activo=1 AND estado IN ('pendiente','en_atencion') AND slot_id IS NULL""")
+        db.execute("""CREATE UNIQUE INDEX IF NOT EXISTS cita_paciente_bloque ON admisiones(paciente_id,slot_id)
+            WHERE activo=1 AND estado != 'cancelado' AND slot_id IS NOT NULL""")
+        if not db.execute("SELECT 1 FROM configuracion WHERE clave='tipos_agenda_v1'").fetchone():
+            with db:
+                for nombre,minutos in [('Consulta general',60),('Control',30),('Primera consulta',60),('Evaluación',45)]:
+                    db.execute('INSERT OR IGNORE INTO tipos_atencion(nombre,minutos,cupos) VALUES(?,?,1)',(nombre,minutos))
+                db.execute("INSERT INTO configuracion(clave,valor) VALUES('tipos_agenda_v1','1')")
+        db.commit()

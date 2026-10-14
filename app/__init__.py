@@ -24,12 +24,15 @@ def create_app(test_config=None):
         secret = archivo.read_text().strip()
     if len(secret) < 32:
         raise RuntimeError('SECRET_KEY debe tener al menos 32 caracteres.')
+    from .network import configuracion_red
+    bind_host,trusted_hosts=configuracion_red(instance)
     app.config.update(SECRET_KEY=secret, DATABASE=str(instance/'clinica.sqlite'),
         SESSION_COOKIE_NAME='__Host-ficha', SESSION_COOKIE_SECURE=True,
         SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='Lax',
         SESSION_COOKIE_PATH='/', PERMANENT_SESSION_LIFETIME=timedelta(hours=8),
-        MAX_CONTENT_LENGTH=2*1024*1024, MAX_FORM_MEMORY_SIZE=32768, MAX_FORM_PARTS=30,
-        REQUIRE_HTTPS=True, TRUSTED_HOSTS=['localhost','127.0.0.1','[::1]','172.24.189.179'])
+        MAX_CONTENT_LENGTH=6*1024*1024, MAX_FORM_MEMORY_SIZE=32768, MAX_FORM_PARTS=30,
+        REQUIRE_HTTPS=True, BIND_HOST=bind_host, TRUSTED_HOSTS=trusted_hosts,
+        DOC_MAX_SIZE=16*1024*1024,DOC_PATIENT_QUOTA=25*1024*1024,DOC_TOTAL_QUOTA=250*1024*1024)
     if test_config:
         app.config.update(test_config)
     init_db(app)
@@ -62,6 +65,10 @@ def create_app(test_config=None):
     app.register_blueprint(auth_bp)
     from .controllers.admision_controller import bp as admision_bp
     app.register_blueprint(admision_bp)
+    from .controllers.agenda_controller import bp as agenda_bp
+    from .controllers.documento_controller import bp as documento_bp
+    app.register_blueprint(agenda_bp)
+    app.register_blueprint(documento_bp)
     from .cli import register_cli
     register_cli(app)
     @app.errorhandler(HTTPException)

@@ -13,4 +13,4 @@ if __name__ == '__main__':
     contexto = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     contexto.minimum_version = ssl.TLSVersion.TLSv1_2
     contexto.load_cert_chain(str(cert),str(key))
-    app.run(host='172.24.189.179',port=8443,debug=False,ssl_context=contexto)
+    app.run(host=app.config['BIND_HOST'],port=8443,debug=False,ssl_context=contexto)

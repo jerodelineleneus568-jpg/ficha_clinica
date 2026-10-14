@@ -1,3 +1,7 @@
+# Agenda y documentos: actualización de seguridad
+
+Consulta AGENDA.md para las rutas nuevas, permisos, límites de adjuntos y la configuración de red conservada. La solicitud admite hasta 6 MB, con límites propios de 5 MB para documentos y 2 MB para Excel. Los archivos se descargan como adjuntos y no se analizan con antivirus en esta versión.
+
 # Seguridad de la ficha clínica
 
 **Actualización de admisión:** consulta ADMISION.md para el nuevo rol paciente, CRUD y las reglas de importación. Esta versión escucha en 172.24.189.179:8443.
@@ -123,7 +127,7 @@ Descarga la versión indicada desde https://www.zaproxy.org/download/ y verifica
 Realiza este análisis sobre una **copia aislada con datos ficticios**, no la base de tu práctica. Puedes generar otra carpeta ejecutando una copia del actualizador en esa carpeta, creando su venv y certificados. Detén el servidor principal y usa el mismo puerto; no copies la base original. Crea usuarios de prueba.
 
 1. En ZAP crea un contexto que incluya solo páginas GET de lectura (por ejemplo `/` y `/pacientes/1`) observadas tras iniciar sesión con un usuario profesional de prueba.
-2. Excluye `/admisiones/nueva`, `/admisiones/importar`, `.*/editar`, `.*/atender`, `/login`, `/logout`, `/password`, `/usuarios.*`, `/profesionales`, `/pacientes/nuevo`, `.*/eliminar` y `.*/atenciones` del análisis activo. No uses POST de creación o cambio de estado como objetivos.
+2. Excluye `/agenda/generar`, `/agenda/tipos.*`, `.*/reservar`, `.*/reprogramar`, `.*/cancelar`, `.*/documentos`, `.*/descargar`, `/admisiones/nueva`, `/admisiones/importar`, `.*/editar`, `.*/atender`, `/login`, `/logout`, `/password`, `/usuarios.*`, `/profesionales`, `/pacientes/nuevo`, `.*/eliminar` y `.*/atenciones` del análisis activo. No uses POST de creación o cambio de estado como objetivos.
 3. Configura la autenticación y la gestión de sesión del contexto: formulario login, campos username/password, token CSRF `csrf` y usuario de prueba. Comprueba que la sesión permanece autenticada y que el indicador de logout no aparece; si el escáner termina en login, el resultado no cubre páginas protegidas.
 4. Selecciona expresamente las solicitudes GET permitidas, evita recorrido automático fuera de contexto, usa una política de intensidad baja y un hilo. Mantén fuera del alcance cualquier otro servicio.
 5. Exporta el reporte y registra contexto, URLs, política, usuario, hora y hallazgos. La auditoría puede crecer y se recomienda limpiar la copia completa al finalizar.

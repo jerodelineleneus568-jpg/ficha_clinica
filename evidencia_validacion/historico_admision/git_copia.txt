@@ -1,0 +1,2 @@
+Revisión del código distribuido en una copia Git temporal, no del repositorio de la usuaria.
+Archivos Git revisados: 44; señales: 0. Revisión de árbol actual; el historial requiere revisión adicional.

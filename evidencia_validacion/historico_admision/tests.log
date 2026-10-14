@@ -1,0 +1,19 @@
+test_migracion_preserva_datos_y_demo_no_se_duplica (test_actualizacion.ActualizacionTest.test_migracion_preserva_datos_y_demo_no_se_duplica) ... ok
+test_atencion_asignada_guarda_historial_una_vez (test_admision.AdmisionTest.test_atencion_asignada_guarda_historial_una_vez) ... ok
+test_crud_y_control_de_version (test_admision.AdmisionTest.test_crud_y_control_de_version) ... ok
+test_edicion_pacientes_funcionarios_y_cuentas (test_admision.AdmisionTest.test_edicion_pacientes_funcionarios_y_cuentas) ... ok
+test_excel_invalido_rechaza_todo_y_formula (test_admision.AdmisionTest.test_excel_invalido_rechaza_todo_y_formula) ... ok
+test_excel_valido_y_repetido (test_admision.AdmisionTest.test_excel_valido_y_repetido) ... ok
+test_migracion_cuentas_antiguas_con_sesiones (test_admision.AdmisionTest.test_migracion_cuentas_antiguas_con_sesiones) ... ok
+test_mismo_paciente_atendido_por_dos_funcionarios (test_admision.AdmisionTest.test_mismo_paciente_atendido_por_dos_funcionarios) ... ok
+test_portal_paciente_aislado (test_admision.AdmisionTest.test_portal_paciente_aislado) ... ok
+test_bloqueo_validaciones_y_xss (test_clinica.ClinicaTest.test_bloqueo_validaciones_y_xss) ... ok
+test_csrf_sesiones_y_https (test_clinica.ClinicaTest.test_csrf_sesiones_y_https) ... ok
+test_desactivacion_revoca_sesion_y_no_borra_auditoria (test_clinica.ClinicaTest.test_desactivacion_revoca_sesion_y_no_borra_auditoria) ... ok
+test_password_revoca_todas_las_sesiones (test_clinica.ClinicaTest.test_password_revoca_todas_las_sesiones) ... ok
+test_roles_e_identidad_atenciones (test_clinica.ClinicaTest.test_roles_e_identidad_atenciones) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 11.889s
+
+OK

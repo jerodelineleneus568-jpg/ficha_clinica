@@ -74,6 +74,8 @@ def editar(id):
     a=AdmisionModel.obtener(id)
     if not a:
         abort(404)
+    if a['slot_id'] is not None:
+        return redirect(url_for('agenda.reprogramar_cita',id=id))
     if a['estado'] not in ('pendiente','cancelado') or not a['paciente_activo']:
         abort(409)
     if request.method=='POST':
@@ -183,6 +185,6 @@ def plantilla():
 @bp.get('/admisiones/exportar.xlsx')
 @roles_required('admin','recepcion')
 def exportar():
-    data=[[a['id'],a['documento'],a['nombre'],a['fecha'],a['especialidad'],a['funcionario'] or 'Sin asignar',a['estado'],a['motivo']] for a in filas()]
+    data=[[a['id'],a['documento'],a['nombre'],a['fecha'],a['especialidad'],a['funcionario'] or 'Sin asignar',a['estado'],a['motivo'],a['inicio'] or '',a['fin'] or '',a['tipo_atencion'] or ''] for a in filas()]
     audit('admisiones_exportadas','admision')
-    return send_file(crear_excel(['id','documento','nombre','fecha','especialidad','funcionario','estado','motivo'],data,titulo='Listado'),as_attachment=True,download_name='admisiones.xlsx',mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    return send_file(crear_excel(['id','documento','nombre','fecha','especialidad','funcionario','estado','motivo','hora_inicio','hora_fin','tipo_atencion'],data,titulo='Listado'),as_attachment=True,download_name='admisiones.xlsx',mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
