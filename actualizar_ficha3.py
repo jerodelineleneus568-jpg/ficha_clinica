@@ -58,7 +58,7 @@ def red_actual(destino):
                 continue
             if not ip.is_loopback:
                 host=value.strip('[]');break
-    return {'host':host or '172.28.246.150','trusted_hosts':trusted}
+    return {'host':host or '172.17.101.31','trusted_hosts':trusted}
 
 def main():
     destino=Path(__file__).resolve().parent

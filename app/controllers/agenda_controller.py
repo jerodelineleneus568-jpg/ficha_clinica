@@ -30,7 +30,7 @@ def listar():
     try:
         desde,hasta,prof,tipo=filtros()
     except ValueError as e:
-        flash(str(e));return redirect(url_for('agenda.listar'))
+        flash(str(e), 'error');return redirect(url_for('agenda.listar'))
     bloques=AgendaModel.listar(desde,hasta,prof,tipo)
     total=sum(b['cupos'] for b in bloques);ocupados=sum(b['ocupados'] for b in bloques)
     return render_template('agenda.html',bloques=bloques,desde=desde,hasta=hasta,profesionales=ProfesionalModel.listar(),tipos=AgendaModel.tipos(),total=total,ocupados=ocupados,minuto=minuto)
@@ -41,10 +41,10 @@ def generar_agenda():
     if request.method=='POST':
         try:
             n=generar(request.form,g.usuario['id'],request.form.getlist('dias'))
-            flash(f'Agenda creada: {n} bloques y {n*int(request.form["cupos"])} cupos totales.')
+            flash(f'Agenda creada: {n} bloques y {n*int(request.form["cupos"])} cupos totales.', 'success')
             return redirect(url_for('agenda.listar',desde=request.form['desde'],hasta=request.form['hasta'],profesional_id=request.form['profesional_id']))
         except (ValueError,sqlite3.IntegrityError) as e:
-            flash(str(e) if isinstance(e,ValueError) else 'No se pudo crear la agenda: configuración duplicada.')
+            flash(str(e) if isinstance(e,ValueError) else 'No se pudo crear la agenda: configuración duplicada.', 'error')
     return render_template('agenda_generar.html',profesionales=ProfesionalModel.listar(),tipos=AgendaModel.tipos(),hoy=hoy())
 
 @bp.route('/agenda/tipos',methods=['GET','POST'])
@@ -61,9 +61,9 @@ def tipos():
                 evento(db,g.usuario['id'],'tipo_atencion_creado',c.lastrowid,'tipo')
             return redirect(url_for('agenda.tipos'))
         except ValueError as e:
-            flash(str(e))
+            flash(str(e), 'error')
         except sqlite3.IntegrityError:
-            flash('Ese tipo ya existe, incluso si está desactivado.')
+            flash('Ese tipo ya existe, incluso si está desactivado.', 'error')
     return render_template('agenda_tipos.html',tipos=get_db().execute('SELECT * FROM tipos_atencion ORDER BY nombre').fetchall())
 
 @bp.route('/agenda/tipos/<int:id>/editar',methods=['GET','POST'])
@@ -78,8 +78,8 @@ def editar_tipo(id):
                 db.execute('UPDATE tipos_atencion SET nombre=?,minutos=?,cupos=?,activo=? WHERE id=?',(*valores,id))
                 evento(db,g.usuario['id'],'tipo_atencion_editado',id,'tipo')
             return redirect(url_for('agenda.tipos'))
-        except ValueError as e:flash(str(e))
-        except sqlite3.IntegrityError:flash('El nombre ya existe.')
+        except ValueError as e:flash(str(e), 'error')
+        except sqlite3.IntegrityError:flash('El nombre ya existe.', 'error')
     return render_template('agenda_tipo_editar.html',tipo=tipo)
 
 def bloque_autorizado(id):
@@ -107,12 +107,12 @@ def reservar_cita(id):
             aid=request.form.get('admision_id','')
             aid=entero(aid,'Admisión',1,10**9) if aid else None
             reservar(id,pid,request.form.get('motivo'),g.usuario['id'],aid)
-            flash('Cita reservada e ingresada a admisión.')
+            flash('Cita reservada e ingresada a admisión.', 'success')
             return redirect(url_for('agenda.detalle',id=id))
-        except ConflictoAgenda as e:flash(str(e))
-        except ValueError as e:flash(str(e))
-        except sqlite3.IntegrityError:flash('El paciente ya tiene esta cita reservada.')
-    pendientes=get_db().execute("""SELECT a.id,p.nombre,p.documento FROM admisiones a JOIN pacientes p ON p.id=a.paciente_id
+        except ConflictoAgenda as e:flash(str(e), 'error')
+        except ValueError as e:flash(str(e), 'error')
+        except sqlite3.IntegrityError:flash('El paciente ya tiene esta cita reservada.', 'error')
+    pendientes=get_db().execute("""SELECT a.id,a.paciente_id,p.nombre,p.documento FROM admisiones a JOIN pacientes p ON p.id=a.paciente_id
         WHERE a.activo=1 AND p.activo=1 AND a.estado='pendiente' AND a.slot_id IS NULL ORDER BY p.nombre""").fetchall()
     return render_template('agenda_reservar.html',bloque=b,pacientes=PacienteModel.listar(),pendientes=pendientes)
 
@@ -140,7 +140,7 @@ def editar_bloque(id):
                 db.execute('UPDATE agenda_bloques SET inicio=?,fin=?,cupos=?,version=version+1 WHERE id=?',(inicio,fin,cupos,id))
                 evento(db,g.usuario['id'],'agenda_editada',id,'agenda')
             return redirect(url_for('agenda.detalle',id=id))
-        except ValueError as e:flash(str(e))
+        except ValueError as e:flash(str(e), 'error')
     return render_template('agenda_editar.html',bloque=b)
 
 @bp.route('/agenda/bloques/<int:id>/eliminar',methods=['GET','POST'])
@@ -149,14 +149,14 @@ def eliminar_bloque(id):
     b=bloque_autorizado(id)
     if request.method=='POST':
         db=get_db()
-        if request.form.get('confirmar')!='ELIMINAR':flash('Escribe ELIMINAR para confirmar.')
+        if request.form.get('confirmar')!='ELIMINAR':flash('Escribe ELIMINAR para confirmar.', 'error')
         else:
             with db:
                 db.execute('BEGIN IMMEDIATE')
                 b=AgendaModel.obtener(id)
                 if not b:abort(404)
                 if b['ocupados']:
-                    flash('No puedes eliminar un bloque con citas: cancela o reprograma las pendientes. El historial atendido se conserva.')
+                    flash('No puedes eliminar un bloque con citas: cancela o reprograma las pendientes. El historial atendido se conserva.', 'error')
                 else:
                     db.execute('UPDATE agenda_bloques SET activo=0,version=version+1 WHERE id=?',(id,))
                     evento(db,g.usuario['id'],'agenda_eliminada',id,'agenda')
@@ -172,10 +172,10 @@ def reprogramar_cita(id):
     if request.method=='POST':
         try:
             reprogramar(id,entero(request.form.get('slot_id'),'Horario',1,10**9),entero(request.form.get('version'),'Versión',1,10**9),g.usuario['id'])
-            flash('Cita reprogramada.');return redirect(url_for('admision.listar'))
-        except ConflictoAgenda as e:flash(str(e))
-        except ValueError as e:flash(str(e))
-        except sqlite3.IntegrityError:flash('Ya existe una cita del paciente para ese bloque.')
+            flash('Cita reprogramada.', 'success');return redirect(url_for('admision.listar'))
+        except ConflictoAgenda as e:flash(str(e), 'error')
+        except ValueError as e:flash(str(e), 'error')
+        except sqlite3.IntegrityError:flash('Ya existe una cita del paciente para ese bloque.', 'error')
     hasta=(date.fromisoformat(hoy())+timedelta(days=31)).isoformat()
     slots=[b for b in AgendaModel.listar(hoy(),hasta) if b['ocupados']<b['cupos']]
     return render_template('agenda_reprogramar.html',admision=a,bloques=slots)
@@ -187,12 +187,12 @@ def cancelar_cita(id):
     if not a or a['slot_id'] is None:abort(404)
     if a['estado']!='pendiente':abort(409)
     if request.method=='POST':
-        if request.form.get('confirmar')!='CANCELAR':flash('Escribe CANCELAR para confirmar.')
+        if request.form.get('confirmar')!='CANCELAR':flash('Escribe CANCELAR para confirmar.', 'error')
         else:
             db=get_db()
             with db:
                 c=db.execute("UPDATE admisiones SET estado='cancelado',version=version+1 WHERE id=? AND version=? AND estado='pendiente' AND activo=1",(id,entero(request.form.get('version'),'Versión',1,10**9)))
                 if c.rowcount!=1:abort(409)
                 evento(db,g.usuario['id'],'cita_cancelada',id,'admision')
-            flash('Cita cancelada. El cupo volvió a estar disponible.');return redirect(url_for('agenda.detalle',id=a['slot_id']))
+            flash('Cita cancelada. El cupo volvió a estar disponible.', 'success');return redirect(url_for('agenda.detalle',id=a['slot_id']))
     return render_template('agenda_cancelar.html',admision=a)

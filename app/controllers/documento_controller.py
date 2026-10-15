@@ -70,9 +70,9 @@ def listar(id):
                 c=db.execute('INSERT INTO documentos(paciente_id,nombre,descripcion,mime,tamano,sha256,contenido,creado_por,creada) VALUES(?,?,?,?,?,?,?,?,?)',
                     (id,nombre,descripcion,mime,len(contenido),hashlib.sha256(contenido).hexdigest(),contenido,g.usuario['id'],int(time.time())))
                 evento(db,g.usuario['id'],'documento_adjuntado',c.lastrowid,'documento')
-            flash('Documento adjuntado a la ficha del paciente.')
+            flash('Documento adjuntado a la ficha del paciente.', 'success')
             return redirect(url_for('documento.listar',id=id))
-        except ValueError as e:flash(str(e))
+        except ValueError as e:flash(str(e), 'error')
     docs=get_db().execute('SELECT id,nombre,descripcion,tamano,creado_por,creada FROM documentos WHERE paciente_id=? AND activo=1 ORDER BY creada DESC,id DESC',(id,)).fetchall()
     return render_template('documentos.html',paciente=paciente,documentos=docs)
 
@@ -101,7 +101,7 @@ def editar(id):
                 db.execute('UPDATE documentos SET descripcion=? WHERE id=? AND activo=1',(descripcion,id))
                 evento(db,g.usuario['id'],'documento_editado',id,'documento')
             return redirect(url_for('documento.listar',id=doc['paciente_id']))
-        except ValueError as e:flash(str(e))
+        except ValueError as e:flash(str(e), 'error')
     return render_template('documento_editar.html',documento=doc)
 
 @bp.route('/documentos/<int:id>/eliminar',methods=['GET','POST'])
@@ -111,7 +111,7 @@ def eliminar(id):
     if g.usuario['rol']!='admin' and doc['creado_por']!=g.usuario['id']:
         abort(403)
     if request.method=='POST':
-        if request.form.get('confirmar')!='ELIMINAR':flash('Escribe ELIMINAR para confirmar.')
+        if request.form.get('confirmar')!='ELIMINAR':flash('Escribe ELIMINAR para confirmar.', 'error')
         else:
             db=get_db()
             with db:

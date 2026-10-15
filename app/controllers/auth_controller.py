@@ -15,9 +15,7 @@ bp = Blueprint('auth',__name__)
 DUMMY_HASH = generate_password_hash(secrets.token_urlsafe(32),method='scrypt')
 
 def destino(rol):
-    if rol=='paciente':
-        return url_for('admision.mis_admisiones')
-    return url_for('auth.auditoria' if rol=='auditor' else 'admision.listar')
+    return url_for('ui.inicio')
 
 @bp.route('/login',methods=['GET','POST'])
 def login():
@@ -75,10 +73,10 @@ def usuarios():
             id=crear_usuario(request.form.get('username',''),request.form.get('nombre',''),
                 request.form.get('password',''),request.form.get('rol',''),id_prof,id_pac)
             audit('usuario_creado','usuario',id)
-            flash('Usuario creado. Entrega su contraseña por un canal seguro.')
+            flash('Usuario creado. Entrega su contraseña por un canal seguro.', 'success')
             return redirect(url_for('auth.usuarios'))
         except ValueError as e:
-            flash(str(e))
+            flash(str(e), 'error')
         except sqlite3.IntegrityError:
             flash('El usuario o profesional ya tiene una cuenta.')
     users=get_db().execute('SELECT id,username,nombre,rol,activo FROM usuarios ORDER BY nombre').fetchall()
@@ -162,10 +160,10 @@ def editar_usuario(id):
                     db.execute('UPDATE usuarios SET password_hash=? WHERE id=?',(generate_password_hash(nueva,method='scrypt'),id))
                 db.execute('DELETE FROM sesiones WHERE usuario_id=?',(id,))
                 evento(db,g.usuario['id'],'usuario_editado',id,'usuario')
-            flash('Usuario actualizado. Debe iniciar sesión nuevamente.')
+            flash('Usuario actualizado. Debe iniciar sesión nuevamente.', 'success')
             return redirect(url_for('auth.login') if id==g.usuario['id'] else url_for('auth.usuarios'))
         except ValueError as e:
-            flash(str(e))
+            flash(str(e), 'error')
         except sqlite3.IntegrityError:
             flash('El usuario, paciente o profesional ya tiene una cuenta vinculada.')
     return render_template('editar_usuario.html',usuario=u,roles=ROLES,pacientes=PacienteModel.listar(),profesionales=ProfesionalModel.listar())

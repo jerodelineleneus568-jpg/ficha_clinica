@@ -34,7 +34,7 @@ def main():
     print('Se conservaron pacientes, cuentas, atenciones, certificados y entorno virtual.')
     print('Ejecuta: venv/bin/python -m pip install -r requirements.txt')
     print('Después: venv/bin/python run.py')
-    print('Dirección: https://172.28.246.150:8443/login')
+    print('Dirección: https://172.17.101.31:8443/login')
     print('No necesitas crear nuevamente tu administrador. Guía: ADMISION.md')
 
 if __name__=='__main__':

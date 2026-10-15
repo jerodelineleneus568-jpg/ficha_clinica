@@ -1,0 +1,27 @@
+test_migracion_preserva_datos_y_demo_no_se_duplica (test_actualizacion.ActualizacionTest.test_migracion_preserva_datos_y_demo_no_se_duplica) ... ok
+test_atencion_asignada_guarda_historial_una_vez (test_admision.AdmisionTest.test_atencion_asignada_guarda_historial_una_vez) ... ok
+test_crud_y_control_de_version (test_admision.AdmisionTest.test_crud_y_control_de_version) ... ok
+test_edicion_pacientes_funcionarios_y_cuentas (test_admision.AdmisionTest.test_edicion_pacientes_funcionarios_y_cuentas) ... ok
+test_excel_invalido_rechaza_todo_y_formula (test_admision.AdmisionTest.test_excel_invalido_rechaza_todo_y_formula) ... ok
+test_excel_valido_y_repetido (test_admision.AdmisionTest.test_excel_valido_y_repetido) ... ok
+test_migracion_cuentas_antiguas_con_sesiones (test_admision.AdmisionTest.test_migracion_cuentas_antiguas_con_sesiones) ... ok
+test_mismo_paciente_atendido_por_dos_funcionarios (test_admision.AdmisionTest.test_mismo_paciente_atendido_por_dos_funcionarios) ... ok
+test_portal_paciente_aislado (test_admision.AdmisionTest.test_portal_paciente_aislado) ... ok
+test_concurrencia_no_sobrevende_cupos (test_agenda_documentos.AgendaDocumentosTest.test_concurrencia_no_sobrevende_cupos) ... ok
+test_cruce_paciente_entre_profesionales_y_cupos_grupales (test_agenda_documentos.AgendaDocumentosTest.test_cruce_paciente_entre_profesionales_y_cupos_grupales) ... ok
+test_crud_bloque_tipos_y_vincular_admision (test_agenda_documentos.AgendaDocumentosTest.test_crud_bloque_tipos_y_vincular_admision) ... ok
+test_cuota_documentos_y_portal_hora (test_agenda_documentos.AgendaDocumentosTest.test_cuota_documentos_y_portal_hora) ... ok
+test_documentos_carga_permisos_y_no_mime_falseado (test_agenda_documentos.AgendaDocumentosTest.test_documentos_carga_permisos_y_no_mime_falseado) ... ok
+test_generacion_rendimiento_pausas_y_cruce_rechazado (test_agenda_documentos.AgendaDocumentosTest.test_generacion_rendimiento_pausas_y_cruce_rechazado) ... ok
+test_profesional_ve_solo_su_agenda_e_historial (test_agenda_documentos.AgendaDocumentosTest.test_profesional_ve_solo_su_agenda_e_historial) ... ok
+test_reserva_capacidad_reprogramacion_y_cancelacion (test_agenda_documentos.AgendaDocumentosTest.test_reserva_capacidad_reprogramacion_y_cancelacion) ... ok
+test_bloqueo_validaciones_y_xss (test_clinica.ClinicaTest.test_bloqueo_validaciones_y_xss) ... ok
+test_csrf_sesiones_y_https (test_clinica.ClinicaTest.test_csrf_sesiones_y_https) ... ok
+test_desactivacion_revoca_sesion_y_no_borra_auditoria (test_clinica.ClinicaTest.test_desactivacion_revoca_sesion_y_no_borra_auditoria) ... ok
+test_password_revoca_todas_las_sesiones (test_clinica.ClinicaTest.test_password_revoca_todas_las_sesiones) ... ok
+test_roles_e_identidad_atenciones (test_clinica.ClinicaTest.test_roles_e_identidad_atenciones) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 15.702s
+
+OK

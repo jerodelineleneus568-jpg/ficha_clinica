@@ -86,10 +86,12 @@ def validar_reserva(db,slot,paciente,excluir=None):
     ocupados=db.execute("SELECT COUNT(*) FROM admisiones WHERE slot_id=? AND activo=1 AND estado!='cancelado' AND (? IS NULL OR id!=?)",(slot['id'],excluir,excluir)).fetchone()[0]
     if ocupados>=slot['cupos']:
         raise ConflictoAgenda('Este horario ya no tiene cupos disponibles.')
-    if db.execute("""SELECT 1 FROM admisiones a JOIN agenda_bloques b ON b.id=a.slot_id
+    cruce=db.execute("""SELECT a.id,b.fecha,b.inicio,b.fin,p.nombre AS funcionario
+        FROM admisiones a JOIN agenda_bloques b ON b.id=a.slot_id JOIN profesionales p ON p.id=b.profesional_id
         WHERE a.paciente_id=? AND a.activo=1 AND a.estado!='cancelado' AND b.fecha=? AND b.inicio<? AND b.fin>?
-        AND (? IS NULL OR a.id!=?)""",(paciente['id'],slot['fecha'],slot['fin'],slot['inicio'],excluir,excluir)).fetchone():
-        raise ConflictoAgenda('El paciente ya tiene una cita en un horario que se cruza.')
+        AND (? IS NULL OR a.id!=?)""",(paciente['id'],slot['fecha'],slot['fin'],slot['inicio'],excluir,excluir)).fetchone()
+    if cruce:
+        raise ConflictoAgenda(f"Este paciente tiene la cita #{cruce['id']} el {cruce['fecha']}, de {cruce['inicio']} a {cruce['fin']}, con {cruce['funcionario']}. Consulta Admisión para reprogramarla o elige otro horario.")
 
 def reservar(slot_id,paciente_id,motivo,actor,admision_id=None):
     db=get_db()

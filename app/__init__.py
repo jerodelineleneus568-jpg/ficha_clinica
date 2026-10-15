@@ -32,7 +32,7 @@ def create_app(test_config=None):
         SESSION_COOKIE_PATH='/', PERMANENT_SESSION_LIFETIME=timedelta(hours=8),
         MAX_CONTENT_LENGTH=6*1024*1024, MAX_FORM_MEMORY_SIZE=32768, MAX_FORM_PARTS=30,
         REQUIRE_HTTPS=True, BIND_HOST=bind_host, TRUSTED_HOSTS=trusted_hosts,
-        DOC_MAX_SIZE=16*1024*1024,DOC_PATIENT_QUOTA=25*1024*1024,DOC_TOTAL_QUOTA=250*1024*1024)
+        DOC_MAX_SIZE=5*1024*1024,DOC_PATIENT_QUOTA=25*1024*1024,DOC_TOTAL_QUOTA=250*1024*1024)
     if test_config:
         app.config.update(test_config)
     init_db(app)
@@ -50,7 +50,7 @@ def create_app(test_config=None):
                 abort(400, description='Formulario vencido o inválido. Recarga la página.')
     @app.after_request
     def headers(response):
-        response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self'; script-src 'none'; img-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+        response.headers['Content-Security-Policy'] = "default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
         response.headers['X-Content-Type-Options'] = 'nosniff'
         response.headers['X-Frame-Options'] = 'DENY'
         response.headers['Referrer-Policy'] = 'no-referrer'
@@ -69,6 +69,10 @@ def create_app(test_config=None):
     from .controllers.documento_controller import bp as documento_bp
     app.register_blueprint(agenda_bp)
     app.register_blueprint(documento_bp)
+    from .controllers.ui_controller import bp as ui_bp
+    from .ui import register_ui
+    app.register_blueprint(ui_bp)
+    register_ui(app)
     from .cli import register_cli
     register_cli(app)
     @app.errorhandler(HTTPException)

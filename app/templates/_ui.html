@@ -1,0 +1,20 @@
+{% macro icon(name) %}<svg class="icon" aria-hidden="true" focusable="false"><use href="{{ url_for('static',filename='icons.svg',v='ux1') }}#{{ name }}"></use></svg>{% endmacro %}
+{% macro navigation() %}
+<a href="{{ url_for('ui.inicio') }}" {% if ui_seccion=='Inicio' %}aria-current="page"{% endif %}>{{ icon('home') }}<span>Inicio</span></a>
+{% if g.usuario.rol in ['admin','recepcion','profesional'] %}
+<span class="nav-group">Atención de pacientes</span>
+<a href="{{ url_for('agenda.listar') }}" {% if ui_seccion=='Agenda' %}aria-current="page"{% endif %}>{{ icon('calendar') }}<span>Agenda y citas</span></a>
+<a href="{{ url_for('admision.listar') }}" {% if ui_seccion=='Admisión' %}aria-current="page"{% endif %}>{{ icon('list') }}<span>Admisión</span></a>
+<a href="{{ url_for('clinica.index') }}" {% if ui_seccion in ['Pacientes','Documentos externos'] %}aria-current="page"{% endif %}>{{ icon('users') }}<span>Pacientes y fichas</span></a>
+<a href="{{ url_for('clinica.profesionales') }}" {% if ui_seccion=='Funcionarios' %}aria-current="page"{% endif %}>{{ icon('staff') }}<span>Funcionarios</span></a>
+{% endif %}
+{% if g.usuario.rol=='paciente' %}
+<a href="{{ url_for('admision.mis_admisiones') }}" {% if ui_seccion=='Mis citas' %}aria-current="page"{% endif %}>{{ icon('calendar') }}<span>Mis citas</span></a>
+<a href="{{ url_for('documento.listar',id=g.usuario.paciente_id) }}" {% if ui_seccion=='Documentos externos' %}aria-current="page"{% endif %}>{{ icon('file') }}<span>Mis documentos</span></a>
+{% endif %}
+{% if g.usuario.rol=='admin' %}<span class="nav-group">Administración</span>
+<a href="{{ url_for('auth.usuarios') }}" {% if ui_seccion=='Usuarios y permisos' %}aria-current="page"{% endif %}>{{ icon('shield') }}<span>Usuarios y permisos</span></a>
+<a href="{{ url_for('agenda.tipos') }}" {% if ui_seccion=='Tipos de atención' %}aria-current="page"{% endif %}>{{ icon('settings') }}<span>Tipos de atención</span></a>{% endif %}
+{% if g.usuario.rol in ['admin','auditor'] %}<a href="{{ url_for('auth.auditoria') }}" {% if ui_seccion=='Auditoría' %}aria-current="page"{% endif %}>{{ icon('shield') }}<span>Auditoría</span></a>{% endif %}
+<span class="nav-group">Mi cuenta</span><a href="{{ url_for('auth.password') }}" {% if ui_seccion=='Mi contraseña' %}aria-current="page"{% endif %}>{{ icon('key') }}<span>Cambiar contraseña</span></a>
+{% endmacro %}

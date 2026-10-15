@@ -20,8 +20,11 @@ test_csrf_sesiones_y_https (test_clinica.ClinicaTest.test_csrf_sesiones_y_https)
 test_desactivacion_revoca_sesion_y_no_borra_auditoria (test_clinica.ClinicaTest.test_desactivacion_revoca_sesion_y_no_borra_auditoria) ... ok
 test_password_revoca_todas_las_sesiones (test_clinica.ClinicaTest.test_password_revoca_todas_las_sesiones) ... ok
 test_roles_e_identidad_atenciones (test_clinica.ClinicaTest.test_roles_e_identidad_atenciones) ... ok
+test_formularios_renderizan_con_ayudas (test_ui.InterfazTest.test_formularios_renderizan_con_ayudas) ... ok
+test_inicio_paciente_y_profesional_no_muestran_otros (test_ui.InterfazTest.test_inicio_paciente_y_profesional_no_muestran_otros) ... ok
+test_inicio_y_navegacion_segun_rol (test_ui.InterfazTest.test_inicio_y_navegacion_segun_rol) ... ok
 
 ----------------------------------------------------------------------
-Ran 22 tests in 15.702s
+Ran 25 tests in 19.491s
 
 OK

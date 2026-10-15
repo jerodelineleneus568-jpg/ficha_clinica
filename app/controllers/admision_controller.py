@@ -60,12 +60,12 @@ def nueva():
                     p=db.execute('SELECT * FROM pacientes WHERE id=?',(id,)).fetchone()
                     evento(db,g.usuario['id'],'paciente_creado',id,'paciente')
                 insertar_admision(db,id,validar_admision(request.form,p),g.usuario['id'])
-            flash('Paciente ingresado a admisión correctamente.')
+            flash('Paciente ingresado a admisión correctamente.', 'success')
             return redirect(url_for('admision.listar'))
         except (ValueError,TypeError) as e:
-            flash(str(e))
+            flash(str(e), 'error')
         except sqlite3.IntegrityError:
-            flash('El paciente ya tiene una admisión abierta o el documento está repetido.')
+            flash('El paciente ya tiene una admisión abierta o el documento está repetido.', 'error')
     return render_template('admision_form.html',admision=None,pacientes=PacienteModel.listar(),profesionales=ProfesionalModel.listar(),hoy=date.today().isoformat())
 
 @bp.route('/admisiones/<int:id>/editar',methods=['GET','POST'])
@@ -92,12 +92,12 @@ def editar(id):
                 if c.rowcount!=1:
                     abort(409)
                 evento(db,g.usuario['id'],'admision_editada',id)
-            flash('Admisión actualizada.')
+            flash('Admisión actualizada.', 'success')
             return redirect(url_for('admision.listar'))
         except ValueError as e:
-            flash(str(e))
+            flash(str(e), 'error')
         except sqlite3.IntegrityError:
-            flash('Ya existe otra admisión abierta para ese paciente.')
+            flash('Ya existe otra admisión abierta para ese paciente.', 'error')
     return render_template('admision_form.html',admision=a,pacientes=[],profesionales=ProfesionalModel.listar(),hoy=date.today().isoformat())
 
 @bp.route('/admisiones/<int:id>/eliminar',methods=['GET','POST'])
@@ -110,7 +110,7 @@ def eliminar(id):
         abort(409)
     if request.method=='POST':
         if request.form.get('confirmar')!='ELIMINAR':
-            flash('Escribe ELIMINAR para confirmar.')
+            flash('Escribe ELIMINAR para confirmar.', 'error')
         else:
             db=get_db()
             with db:
@@ -156,7 +156,7 @@ def atender(id):
             flash('Atención iniciada.' if accion=='iniciar' else 'Atención guardada en la ficha clínica.')
             return redirect(url_for('admision.atender',id=id) if accion=='iniciar' else url_for('admision.listar'))
         except ValueError as e:
-            flash(str(e))
+            flash(str(e), 'error')
     return render_template('admision_atender.html',admision=a)
 
 @bp.route('/admisiones/importar',methods=['GET','POST'])

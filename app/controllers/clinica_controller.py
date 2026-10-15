@@ -39,12 +39,12 @@ def nuevo_paciente():
             id = PacienteModel.crear((documento, campo('nombre'), fecha('nacimiento'),
                                      campo('telefono',40,False), campo('correo',200,False)))
             audit('paciente_creado','paciente',id)
-            flash('Paciente registrado correctamente.')
+            flash('Paciente registrado correctamente.', 'success')
             return redirect(url_for('clinica.ficha', id=id))
         except sqlite3.IntegrityError:
-            flash('Ya existe un paciente con ese documento.')
+            flash('Ya existe un paciente con ese documento.', 'error')
         except ValueError as e:
-            flash(str(e))
+            flash(str(e), 'error')
     return render_template('nuevo_paciente.html')
 
 @bp.get('/pacientes/<int:id>')
@@ -73,9 +73,9 @@ def nueva_atencion(id):
         AtencionModel.crear((id, profesional, fecha('fecha'), campo('motivo',2000),
                             campo('diagnostico',4000), campo('tratamiento',4000)))
         audit('atencion_creada','paciente',id)
-        flash('Atención registrada.')
+        flash('Atención registrada.', 'success')
     except ValueError as e:
-        flash(str(e))
+        flash(str(e), 'error')
         return ficha(id)
     return redirect(url_for('clinica.ficha', id=id))
 
@@ -90,11 +90,11 @@ def eliminar(id):
         if get_db().execute("SELECT 1 FROM admisiones WHERE paciente_id=? AND activo=1 AND estado='en_atencion'",(id,)).fetchone():
             abort(409)
         if request.form.get('confirmar') != 'ELIMINAR':
-            flash('Escribe ELIMINAR para confirmar.')
+            flash('Escribe ELIMINAR para confirmar.', 'error')
         else:
             PacienteModel.eliminar(id)
             audit('paciente_desactivado','paciente',id)
-            flash('Paciente desactivado. El historial se conserva.')
+            flash('Paciente desactivado. El historial se conserva.', 'success')
             return redirect(url_for('clinica.index'))
     return render_template('eliminar.html', paciente=paciente)
 
@@ -107,10 +107,10 @@ def profesionales():
         try:
             ProfesionalModel.crear(campo('nombre'), campo('especialidad',100), campo('cargo',100))
             audit('profesional_creado','profesional')
-            flash('Profesional registrado.')
+            flash('Profesional registrado.', 'success')
             return redirect(url_for('clinica.profesionales'))
         except ValueError as e:
-            flash(str(e))
+            flash(str(e), 'error')
     return render_template('profesionales.html', profesionales=ProfesionalModel.listar())
 
 @bp.route('/pacientes/<int:id>/editar',methods=['GET','POST'])
@@ -128,10 +128,10 @@ def editar_paciente(id):
             with db:
                 db.execute('UPDATE pacientes SET documento=?,nombre=?,nacimiento=?,telefono=?,correo=? WHERE id=? AND activo=1',(*valores,id))
                 evento(db,g.usuario['id'],'paciente_editado',id,'paciente')
-            flash('Datos del paciente actualizados.')
+            flash('Datos del paciente actualizados.', 'success')
             return redirect(url_for('clinica.ficha',id=id))
         except ValueError as e:
-            flash(str(e))
+            flash(str(e), 'error')
         except sqlite3.IntegrityError:
             flash('El documento ya corresponde a otro paciente.')
     return render_template('editar_paciente.html',paciente=paciente)
@@ -156,7 +156,7 @@ def editar_profesional(id):
                 evento(db,g.usuario['id'],'funcionario_editado',id,'profesional')
             return redirect(url_for('clinica.profesionales'))
         except ValueError as e:
-            flash(str(e))
+            flash(str(e), 'error')
     return render_template('editar_profesional.html',profesional=p)
 
 @bp.route('/profesionales/<int:id>/eliminar',methods=['GET','POST'])
@@ -170,11 +170,11 @@ def eliminar_profesional(id):
     if request.method=='POST':
         db=get_db()
         if request.form.get('confirmar')!='ELIMINAR':
-            flash('Escribe ELIMINAR para confirmar.')
+            flash('Escribe ELIMINAR para confirmar.', 'error')
         else:
             with db:
                 if db.execute("SELECT 1 FROM admisiones WHERE profesional_id=? AND activo=1 AND estado IN ('pendiente','en_atencion')",(id,)).fetchone():
-                    flash('Primero reasigna o completa las admisiones del funcionario.')
+                    flash('Primero reasigna o completa las admisiones del funcionario.', 'error')
                 else:
                     db.execute('UPDATE profesionales SET activo=0 WHERE id=?',(id,))
                     db.execute('UPDATE usuarios SET activo=0 WHERE profesional_id=?',(id,))
